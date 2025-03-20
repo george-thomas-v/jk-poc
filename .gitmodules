@@ -1,0 +1,6 @@
+[submodule "ingestion"]
+	path = ingestion
+	url = https://github.com/george-thomas-v/ingestion.git
+[submodule "gateway"]
+	path = gateway
+	url = https://github.com/george-thomas-v/gateway.git

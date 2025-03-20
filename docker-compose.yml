@@ -1,0 +1,28 @@
+services:
+  ingestion:
+    build:
+      context: ./ingestion 
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - gateway
+    env_file:
+      - ingestion/.env
+    networks:
+      - microservices_network
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - gateway/.env
+    networks:
+      - microservices_network
+
+networks:
+  microservices_network:
+    driver: bridge
