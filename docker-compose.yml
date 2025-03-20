@@ -1,12 +1,56 @@
 services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - microservices_network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - microservices_network
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - microservices_network
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5433:5432"
+    networks:
+      - microservices_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   ingestion:
     build:
-      context: ./ingestion 
+      context: ./ingestion
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
     depends_on:
       - gateway
+      - postgres
     env_file:
       - ingestion/.env
     networks:
@@ -20,9 +64,15 @@ services:
       - "3000:3000"
     env_file:
       - gateway/.env
+    depends_on:
+      - redis
+      - postgres
     networks:
       - microservices_network
 
 networks:
   microservices_network:
     driver: bridge
+
+volumes:
+  postgres_data:
