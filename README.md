@@ -44,7 +44,7 @@ Before running the project, ensure you have the following installed:
 
 ### Clone the repository
 ```sh
-git clone https://github.com/george-thomas-v/jk-poc.git
+git clone --recurse-submodules https://github.com/george-thomas-v/jk-poc.git
 cd jk-poc
 ```
 
@@ -53,7 +53,7 @@ Copy the example environment file and configure it:
 ```sh
 cp .env.example .env
 ```
-Modify the `.env` file with your database, Redis, and Kafka configurations.
+Modify the `.env` file with your database, Redis, and Kafka configurations. If you are planning to run the project entirely inside docker, refer to  `docker-compose.yml ` file in the root folder to get default ports and hosts.
 
 ### Using Docker (Recommended)
 Build and start the services:
@@ -88,7 +88,7 @@ KAFKA_BROKER=kafka:9092
 ## Running the Project
 ### If using Docker:
 ```sh
-docker compose up -d
+docker compose up --build -d
 ```
 
 ### If running locally:
@@ -101,6 +101,10 @@ docker compose up -d
    ```sh
    npm run start
    ```
+### Key points to note regarding Database:
+There are two ways to initialize postgress.
+1. Building the app normally, which will initialize the database with required tables (refer to  `docker-compose.yml`).
+2. Running the migrations to create the tables from a previous version. For this some changes are needed to be done in the initializtion scripts or migrations can be run manually (Migrations can be found in `src/data/migratoins` inside each submodule).
 
 ## Swagger API Documentation
 Once the application is running, access the **Swagger UI** at:
@@ -112,7 +116,7 @@ Make sure that the **PORT** matches the one provided in the respective `.env` fi
 
 ## Deployment
 For production deployment, follow these steps:
-1. **Set up a PostgreSQL and Redis instance** on a cloud provider.
+1. **Set up a PostgreSQL and Redis instance** on a cloud provider (This is recomended. Once cloud is setup, remove the respective lines of code from  `docker-compose.yml`).
 2. **Configure environment variables** to point to the cloud services.
 3. **Build and run the services** using:
    ```sh
